@@ -9,6 +9,11 @@ export async function api<T>(url: string, options: RequestInit = {}): Promise<T>
     if (error instanceof DOMException && error.name === 'AbortError') throw error
     throw new APIError('The server is unreachable. Check that the Flask API is running, then try again.')
   }
+  const contentType = (response.headers.get('Content-Type') || '').toLowerCase()
+  const jsonResponse = contentType.includes('application/json') || contentType.includes('+json')
+  if (contentType.includes('text/html') || (response.status === 404 && !jsonResponse)) {
+    throw new APIError('The website returned a page instead of API data. Configure the /api route to your hosted Flask backend and redeploy. For local development, start the Flask API.', 'api_not_configured')
+  }
   let data
   try { data = await response.json() }
   catch { throw new APIError('The server returned an unexpected response. Check that the Flask API is running.') }

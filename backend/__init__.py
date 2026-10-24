@@ -32,6 +32,15 @@ from .watchlist import load_requested_names, load_watchlist, watchlist_rows
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def database_uri(value):
+    # Hosted PostgreSQL providers commonly supply URLs without a driver name.
+    # This project installs psycopg 3 rather than SQLAlchemy's default psycopg2.
+    for prefix in ("postgres://", "postgresql://"):
+        if value.startswith(prefix):
+            return "postgresql+psycopg://" + value[len(prefix):]
+    return value
+
+
 def public_page(page):
     return {"id": page["id"], "name": page.get("name", "Facebook Page"),
             "url": page.get("link") or page.get("url") or f"https://www.facebook.com/profile.php?id={page['id']}",
@@ -72,7 +81,7 @@ def create_app(test_config=None):
         META_PERMISSIONS=os.getenv("META_PERMISSIONS", "pages_show_list,pages_read_engagement,read_insights"),
         FRONTEND_URL=os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/"),
         DEMO_MODE=os.getenv("DEMO_MODE", "auto"),
-        SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URL", "sqlite:///pagepulse.db"),
+        SQLALCHEMY_DATABASE_URI=database_uri(os.getenv("DATABASE_URL", "sqlite:///pagepulse.db")),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.getenv("COOKIE_SECURE", "false").lower() == "true",
