@@ -1,0 +1,13 @@
+Flask>=3.1,<4
+Flask-SQLAlchemy>=3.1,<4
+Flask-Migrate>=4.1,<5
+Flask-Limiter>=4,<5
+python-dotenv>=1.1,<2
+requests>=2.32.4,<3
+cryptography>=46,<48
+psycopg[binary]>=3.2,<4
+waitress>=3,<4
+reportlab>=4.4,<5
+uharfbuzz>=0.50,<1
+pypdf>=6,<7
+pytest>=8.4,<10
